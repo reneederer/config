@@ -15,7 +15,7 @@ Plugin 'scrooloose/nerdcommenter'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-surround'
-Plugin 'pangloss/vim-javascript'
+Plugin 'gavocanov/vim-js-indent'
 Plugin 'groenewege/vim-less'
 Plugin 'easymotion/vim-easymotion'
 Plugin 'kien/ctrlp.vim'
@@ -24,7 +24,7 @@ Plugin 'bling/vim-airline'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
-filetype plugin indent on    " required
+"filetype plugin on    " required
 " To ignore plugin indent changes, instead use:
 "filetype plugin on
 "
@@ -36,9 +36,14 @@ filetype plugin indent on    " required
 ""
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
+filetype indent on
+filetype plugin indent on
 syntax enable
-filetype plugin on
 set background=light
+set nocindent
+set autoindent
+set nosmartindent
+"set indentexpr=
 colorscheme solarized
 set tabstop=4
 set softtabstop=4
@@ -50,21 +55,24 @@ set incsearch
 set number
 set showcmd
 set cursorline
-filetype indent on
 set wildmenu
 set lazyredraw
-set incsearch
 set hlsearch
 set backspace=indent,eol,start
+let delimitMate_expand_cr=1
 set nowrap
 let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
-let g:ctrlp_mruf_max = 10
+let g:ctrlp_cmd = 'CtrlPMRU'
+let g:ctrlp_mruf_max = 25
 let mapleader=","
 if has('gui_running')
   set guifont=Liberation\ Mono:h13
 endif
-autocmd BufNewFile,BufRead *.less set filetype=less
-autocmd FileType less set omnifunc=csscomplete#CompleteCSS
+"autocmd BufNewFile,BufRead *.less set filetype=less
+"autocmd FileType less set omnifunc=csscomplete#CompleteCSS
+let g:ctrlp_prompt_mappings = {
+    \ 'AcceptSelection("e")': ['<c-t>'],
+    \ 'AcceptSelection("t")': ['<cr>', '<2-LeftMouse>'],
+    \ }
 
 
