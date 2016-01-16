@@ -2,13 +2,20 @@
 #NoEnv
 SetTitleMatchMode 2
 SetWorkingDir %A_ScriptDir%
+sendMode Input
 
 global clipboardStoreCount = 10
 global storedClipboards := Object()
+global quickClipboard = 
 
 
 setCapsLockState, AlwaysOff
 setKeyDelay, 100, 100
+
+:*?:ue::ü
+:*?:oe::ö
+:*?:ae::ä
+::Rene::René
 capslock & j::sendInput,{down}
 capslock & k::
     if getKeyState("shift", "p")
@@ -31,19 +38,16 @@ capslock up::
     return
 
 #space::toggleCurrentWindowOnTop()
-#g::searchGoogle()
+#g:: searchGoogle() ; TODO opens some other game window by default
+
 ^l::reloadScript()
 
 *^c:: copyToClipboard(getHighlightedText())
-
-
 
 *^v::
 	sleep, 100
 	showClipboard()
 	return
-
-
 
 F12::
 	if winActive("ahk_exe chrome.exe")
@@ -64,13 +68,42 @@ F12::
 	return
 
 
+$~MButton up::
+	highlightedText := getHighlightedText()
+	if highlightedText != 
+	{
+		quickClipboard = %highlightedText%
+	}
+	mouseGetPos,x,y
+	caretX = %a_caretX%
+	caretY = %a_caretY%
+	click
+	sendAsClipboard(quickClipboard)
+	mouseClick,,caretX,caretY
+	mouseMove,x,y
+	return
+
+$~LButton up::
+	highlightedText := getHighlightedText()
+	if highlightedText != 
+	{
+		quickClipboard = %highlightedText%
+	}
+	return
+
+
 
 searchGoogle()
 {
-    inputBox,search,Google-Suche,Google-Suche,
+	text := getHighlightedText()
+	if text = 
+	{
+		text = %clipboard%
+	}
+    inputBox,search,Google-Suche,Google-Suche,,,,,,,,%text%
     if !errorLevel
     {
-        run,http://www.google.de?query=%search%
+        run % "http://www.google.de?query=" . uriEncode(search)
     }
 }
 
@@ -86,7 +119,7 @@ getHighlightedText()
     oldClipBoard = %clipboard%
     clipboard = 
     sendInput,^c
-    clipWait,0,1
+    clipWait,1,1
     newClipBoard = %clipboard%
     clipboard = %oldClipBoard%
     if errorLevel
@@ -94,6 +127,17 @@ getHighlightedText()
     	return ""
     }
 	return newClipBoard
+}
+
+
+sendAsClipboard(text)
+{
+	newClipboard = %clipboardAll%
+	clipboard = %text%
+	sendInput,^v
+	sleep,10
+	clipboard = %newClipBoard%
+	return
 }
 
 
@@ -141,17 +185,18 @@ showClipboard()
 			return
 		}
 	}
-		Gui, Add, ListView, w200 H200 gLV AltSubmit,   .     
-		Gui, Add, Button, Hidden Default, Default
 
-		loop,%clipboardStoreCount%
-		{  
-			LV_Add("", storedClipboards[a_index])
-		}
-		LV_Modify(0, "-Select")  ; to deselect all selected rows
-		LV_Modify(1,"Focus Select")
-		Gui, Show,,Clipboard-Auswahl
-		return
+	Gui, Add, ListView, w200 H200 gLV AltSubmit,   .     
+	Gui, Add, Button, Hidden Default, Default
+
+	loop,%clipboardStoreCount%
+	{  
+		LV_Add("", storedClipboards[a_index])
+	}
+	LV_Modify(0, "-Select")  ; to deselect all selected rows
+	LV_Modify(1,"Focus Select")
+	Gui, Show,,Clipboard-Auswahl
+	return
 
 	LV:
 		if A_GuiEvent = DoubleClick
@@ -206,8 +251,28 @@ copyToClipboard(text)
 
 
 
+uriDecode(str) {
+	Loop
+		If RegExMatch(str, "i)(?<=%)[\da-f]{1,2}", hex)
+			StringReplace, str, str, `%%hex%, % Chr("0x" . hex), All
+		Else Break
+	Return, str
+}
 
 
+uriEncode(str) {
+   f = %A_FormatInteger%
+   SetFormat, Integer, Hex
+   If RegExMatch(str, "^\w+:/{0,2}", pr)
+      StringTrimLeft, str, str, StrLen(pr)
+   StringReplace, str, str, `%, `%25, All
+   Loop
+      If RegExMatch(str, "i)[^\w\.~%/:]", char)
+         StringReplace, str, str, %char%, % "%" . SubStr(Asc(char),3), All
+      Else Break
+   SetFormat, Integer, %f%
+   Return, pr . str
+}
 
 
 
