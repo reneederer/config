@@ -34,10 +34,14 @@ capslock up::
 #g::searchGoogle()
 ^l::reloadScript()
 
-*^c::copyToClipboard()
+*^c:: copyToClipboard(getHighlightedText())
+
+
+
 *^v::
 	sleep, 100
 	showClipboard()
+	return
 
 
 
@@ -107,11 +111,17 @@ reloadScript()
 }
 
 
-#IfWinActive,titeal
+#IfWinActive,Clipboard-Auswahl
 ^c::
 	sendInput,{up}
 	return
 ^v::
+	sendInput,{down}
+	return
+^k::
+	sendInput,{up}
+	return
+^j::
 	sendInput,{down}
 	return
 ctrl up::
@@ -121,34 +131,33 @@ ctrl up::
 
 showClipboard()
 {
-	Gui, Add, ListView, w300 H300 gLV AltSubmit, Text
-	Gui, Add, Button, Hidden Default, Default
+	loop, 25
+	{
+		sleep, 10
+		if(!getKeyState("ctrl","P"))
+		{
+			copyToClipboard(storedClipboards[1])
+			sendInput,^v
+			return
+		}
+	}
+		Gui, Add, ListView, w200 H200 gLV AltSubmit,   .     
+		Gui, Add, Button, Hidden Default, Default
 
-	loop,%clipboardStoreCount%
-	{  
-		LV_Add("", storedClipboards[a_index])
-	}
-	LV_Modify(0, "-Select")  ; to deselect all selected rows
-	LV_Modify(1,"Focus Select")
-	sleep, 300
-	if(!getKeyState("ctrl","P"))
-	{
-		LV_GetText(col1, 1, 1)
-		clipboard = %col1%
-		sendInput,^v
-		Gui,destroy
-	}
-	else
-	{
-		Gui, Show,, titeal
-	}
-	return
+		loop,%clipboardStoreCount%
+		{  
+			LV_Add("", storedClipboards[a_index])
+		}
+		LV_Modify(0, "-Select")  ; to deselect all selected rows
+		LV_Modify(1,"Focus Select")
+		Gui, Show,,Clipboard-Auswahl
+		return
 
 	LV:
 		if A_GuiEvent = DoubleClick
 		{
 			LV_GetText(col1, A_EventInfo, 1)
-			clipboard = %col1%
+			copyToClipboard(col1)
 			Gui, destroy
 			sendInput,^v
 		}
@@ -167,7 +176,7 @@ showClipboard()
 		}
 
 		LV_GetText(col1, LV_GetNext(0, "Focused"), 1)
-		clipboard = %col1%
+		copyToClipboard(col1)
 		Gui, destroy
 		sendInput,^v
 	return
@@ -176,9 +185,8 @@ showClipboard()
 
 
 
-copyToClipboard()
+copyToClipboard(text)
 {
-	text := getHighlightedText()
 	if text = 
 	{
 		return
@@ -187,12 +195,12 @@ copyToClipboard()
 	{
 		if(storedClipboards[clipboardStoreCount-a_index] = text)
 		{
-		storedClipboards.removeAt(clipboardStoreCount-a_index)
-		msgbox, found
+			storedClipboards.removeAt(clipboardStoreCount-a_index)
 		}
 		storedClipboards[clipboardStoreCount-a_index+1] := storedClipboards[clipboardStoreCount-a_index]
 	}
-	storedClipboards[1] := getHighlightedText()
+	storedClipboards[1] := text
+	clipboard := text
 }
 
 
