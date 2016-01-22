@@ -1,22 +1,31 @@
 #SingleInstance force
 #NoEnv
 SetTitleMatchMode 2
+setCapsLockState, AlwaysOff
 SetWorkingDir %A_ScriptDir%
+setMouseDelay,-1
 sendMode Input
+Hotkey mbutton, paste_selection
+hotkey mbutton, on
 
 global clipboardStoreCount = 10
 global storedClipboards := Object()
 global quickClipboard = 
 
 
-setCapsLockState, AlwaysOff
-setKeyDelay, 100, 100
 
-:*?:ue::ü
-:*?:oe::ö
-:*?:ae::ä
 ::Rene::René
-capslock & j::sendInput,{down}
+capslock & j::
+    if getKeyState("shift", "p")
+    {
+        sendInput,{shift down}{down}{shift down}
+    }
+    else
+    {
+        sendInput,{down}
+    }
+    return
+
 capslock & k::
     if getKeyState("shift", "p")
     {
@@ -27,8 +36,25 @@ capslock & k::
         sendInput,{up}
     }
     return
-capslock & h::sendInput,{left}
-capslock & l::sendInput,{right}
+capslock & h::
+    if getKeyState("shift", "p")
+    {
+        sendInput,{shift down}{left}{shift left}
+    }
+    else
+    {
+        sendInput,{left}
+    }
+    return
+capslock & l::
+    if getKeyState("shift", "p") {
+        sendInput,{shift down}{right}{shift right}
+    }
+    else
+    {
+        sendInput,{right}
+    }
+    return
 capslock & m::sendInput,{enter}
 capslock up::
     if winActive("ahk_exe gvim.exe")
@@ -42,12 +68,14 @@ capslock up::
 
 ^l::reloadScript()
 
-*^c:: copyToClipboard(getHighlightedText())
+*^c::
+    copyToClipboard(getHighlightedText())
+    return
 
 *^v::
-	sleep, 100
 	showClipboard()
 	return
+
 
 F12::
 	if winActive("ahk_exe chrome.exe")
@@ -66,31 +94,6 @@ F12::
 		}
 	}
 	return
-
-
-$~MButton up::
-	highlightedText := getHighlightedText()
-	if highlightedText != 
-	{
-		quickClipboard = %highlightedText%
-	}
-	mouseGetPos,x,y
-	caretX = %a_caretX%
-	caretY = %a_caretY%
-	click
-	sendAsClipboard(quickClipboard)
-	mouseClick,,caretX,caretY
-	mouseMove,x,y
-	return
-
-$~LButton up::
-	highlightedText := getHighlightedText()
-	if highlightedText != 
-	{
-		quickClipboard = %highlightedText%
-	}
-	return
-
 
 
 searchGoogle()
@@ -114,29 +117,47 @@ toggleCurrentWindowOnTop()
 }
 
 
+
 getHighlightedText()
 {
-    oldClipBoard = %clipboard%
+    oldClipBoard := clipboardAll
     clipboard = 
     sendInput,^c
-    clipWait,1,1
+    clipWait,0.5
+    sleep,10
     newClipBoard = %clipboard%
-    clipboard = %oldClipBoard%
-    if errorLevel
+    sleep,10
+    clipboard = 
+    if(oldClipboard != "")
     {
-    	return ""
+        clipboard := oldClipBoard
+        clipWait,1,1
+        sleep,20
     }
+
 	return newClipBoard
 }
 
 
 sendAsClipboard(text)
 {
-	newClipboard = %clipboardAll%
+    if(text = )
+    {
+        return
+    }
+	oldClipboard = %clipboardAll%
+    clipboard = 
 	clipboard = %text%
+	clipWait
 	sendInput,^v
-	sleep,10
-	clipboard = %newClipBoard%
+	sleep,20
+    clipboard = 
+	clipboard = %oldClipBoard%
+    if(oldClipboard != "")
+    {
+        clipWait
+    }
+    sleep,20
 	return
 }
 
@@ -147,7 +168,7 @@ reloadScript()
     if winActive("AutoHotKey.ahk")
     {
         sendInput,{escape}:w{enter}
-        sleep, 50
+        sleep, 20
         msgbox,,,Reloaded!, 1
         reload
     }
@@ -175,16 +196,22 @@ ctrl up::
 
 showClipboard()
 {
-	loop, 25
-	{
-		sleep, 10
-		if(!getKeyState("ctrl","P"))
-		{
-			copyToClipboard(storedClipboards[1])
-			sendInput,^v
-			return
-		}
-	}
+	;keyWait,v,T0.3
+	keyWait,Control,T0.5
+    if !errorLevel
+    {
+        sendAsClipboard(storedClipboards[1])
+        return
+    }
+
+    if !getKeyState("control", "p")
+    {
+        if(clipboard != )
+        {
+            sendAsClipboard(storedClipboards[1])
+        }
+        return
+    }
 
 	Gui, Add, ListView, w200 H200 gLV AltSubmit,   .     
 	Gui, Add, Button, Hidden Default, Default
@@ -202,9 +229,8 @@ showClipboard()
 		if A_GuiEvent = DoubleClick
 		{
 			LV_GetText(col1, A_EventInfo, 1)
-			copyToClipboard(col1)
 			Gui, destroy
-			sendInput,^v
+			sendAsClipboard(col1)
 		}
 		return
 
@@ -221,9 +247,8 @@ showClipboard()
 		}
 
 		LV_GetText(col1, LV_GetNext(0, "Focused"), 1)
-		copyToClipboard(col1)
 		Gui, destroy
-		sendInput,^v
+        sendAsClipboard(col1)
 	return
 }
 
@@ -245,7 +270,6 @@ copyToClipboard(text)
 		storedClipboards[clipboardStoreCount-a_index+1] := storedClipboards[clipboardStoreCount-a_index]
 	}
 	storedClipboards[1] := text
-	clipboard := text
 }
 
 
@@ -274,9 +298,35 @@ uriEncode(str) {
    Return, pr . str
 }
 
+    
+#IfWinNotActive ahk_class ConsoleWindowClass
+~lButton up::
+    winWait,A,,1
+    text := getHighlightedText()
+    if text = 
+    {
+        keyWait,lbutton,T0.5
+        if !errorLevel
+        {
+            text := getHighlightedText()
+        }
+    }
+    if text != 
+    {
+        quickClipboard := text
+    }
+return
+#IfWinNotActive
 
-
-
+  
+paste_selection:
+    sendinput {lbutton}
+    sendAsClipboard(quickClipboard)
+return
+  
+^mbutton::
+    sendAsClipboard(quickClipboard)
+return
 
 
 
