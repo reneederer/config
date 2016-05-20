@@ -5,16 +5,81 @@ setCapsLockState, AlwaysOff
 SetWorkingDir %A_ScriptDir%
 setMouseDelay,-1
 sendMode Input
-Hotkey mbutton, paste_selection
-hotkey mbutton, on
+; Hotkey mbutton, paste_selection
+; hotkey mbutton, on
 
-global clipboardStoreCount = 10
-global storedClipboards := Object()
-global quickClipboard = 
+; global clipboardStoreCount = 10
+; global storedClipboards := Object()
+; global quickClipboard = 
 
+:*:rasdial b::rasdial Breitbandverbindung ar2522738930 21304279
+:*:sgf::Sehr geehrte Frau{space}
+:*:sgh::Sehr geehrter Herr{space}
 
+!r::
+    inputbox,command
+    runCommand(command)
+    return
 
+runCommand(command)
+{
+    if(command == "elm")
+    {
+        startElm()
+    }
+}
+
+startElm()
+{
+	inputbox,folder,Wo liegt der Server?,Wo liegt der Server?,,,,,,,,C:\UniserverZ\www\elm
+	inputbox,file,Welche Datei soll editiert werden?,Welche Datei soll editiert werden?,,,,,,,,Main.elm
+    sleep,100
+	sendInput,#r
+	sleep,100
+	sendInput,cmd /K "cd %folder%"
+    sleep,100
+    sendInput,{enter}
+    sleep,100
+    sendInput,elm.exe reactor{enter}
+    sleep,100
+	sendInput,{LWin down}r{LWin up}
+	sleep,100
+	sendInput,gvim %folder%\%file%
+    sleep,100
+    sendInput,{enter}
+    sleep,100
+    run,http://localhost:8000/%file%
+    return
+}
+
+#IfWinActive ahk_class ConsoleWindowClass
+!Up:: 
+Send {WheelUp}
+Return
+
+!Down:: 
+Send {WheelDown} 
+Return
+#IfWinActive
+
+:*:mfg::Mit freundlichen Grüßen{enter}{enter}René Ederer{enter}Steinmetzstr. 2{enter}90431 Nürnberg
 ::Rene::René
+SC056 & m::sendInput,1
+SC056 & ,::sendInput,2
+SC056 & .::sendInput,3
+SC056 & j::sendInput,4
+SC056 & k::sendInput,5
+SC056 & l::sendInput,6
+SC056 & u::sendInput,7
+SC056 & i::sendInput,8
+SC056 & o::sendInput,9
+SC056 & space::sendInput,0
+capslock & pause::setCapsLockState,off
+
+F9::
+    sendInput,#r
+    sleep,50
+    sendInput,rasdial Breitbandverbindung ar2522738930 21304279{enter}
 capslock & j::
     if getKeyState("shift", "p")
     {
@@ -25,7 +90,6 @@ capslock & j::
         sendInput,{down}
     }
     return
-
 capslock & k::
     if getKeyState("shift", "p")
     {
@@ -56,28 +120,44 @@ capslock & l::
     }
     return
 capslock & m::sendInput,{enter}
+capslock & o::sendInput,{end}{enter}
+capslock & p::sendInput,{backspace}
+capslock & i::sendInput,{end}
+capslock & `;::sendInput,{home}
+capslock & '::sendInput,{home}{shift down}{end}{shift up}^x{backspace}
+:*:cw::{control down}{shift down}{right}{shift up}{control up}^x
+
+; `; & w::sendInput,{esc}daw
+
+
 capslock up::
     if winActive("ahk_exe gvim.exe")
     {
         sendInput,{escape}
+        return
     }
-    return
+    else
+    {
+        sendInput,!{tab}
+        return
+    }
+
 
 #space::toggleCurrentWindowOnTop()
 #g:: searchGoogle() ; TODO opens some other game window by default
 
 ^l::reloadScript()
 
-*^c::
-    copyToClipboard(getHighlightedText())
-    return
+; *^c::
+;     copyToClipboard(getHighlightedText())
+;     return
 
-*^v::
-	showClipboard()
-	return
+; *^v::
+;	showClipboard()
+; 	return
 
 
-F12::
+$F5::
 	if winActive("ahk_exe chrome.exe")
 	{
 		sendInput,{alt down}{tab}{alt up}
@@ -86,12 +166,18 @@ F12::
 	{
 		if winActive("ahk_exe gvim.exe")
 		{
-			sendInput,{escape}:wall{enter}
-			sleep,50
+			sendInput,{escape}
+            sleep,250
+            sendInput,:wall{enter}
+			sleep,100
 			sendInput,{alt down}{tab}{alt up}
-			sleep,200
+			sleep,100
 			sendInput,{f5}
 		}
+		else
+{
+	sendInput,{f5}
+}
 	}
 	return
 
@@ -106,7 +192,7 @@ searchGoogle()
     inputBox,search,Google-Suche,Google-Suche,,,,,,,,%text%
     if !errorLevel
     {
-        run % "http://www.google.de?query=" . uriEncode(search)
+        run % "http://www.google.de/#q=" . uriEncode(search)
     }
 }
 
@@ -123,7 +209,7 @@ getHighlightedText()
     oldClipBoard := clipboardAll
     clipboard = 
     sendInput,^c
-    clipWait,0.5
+    clipWait,0.1
     sleep,10
     newClipBoard = %clipboard%
     sleep,10
@@ -145,14 +231,15 @@ sendAsClipboard(text)
     {
         return
     }
-	oldClipboard = %clipboardAll%
+	oldClipboard := clipboardAll
     clipboard = 
-	clipboard = %text%
+	clipboard := text
 	clipWait
+    sleep,40
 	sendInput,^v
-	sleep,20
+	sleep,40
     clipboard = 
-	clipboard = %oldClipBoard%
+	clipboard := oldClipBoard
     if(oldClipboard != "")
     {
         clipWait
@@ -196,6 +283,7 @@ ctrl up::
 
 showClipboard()
 {
+	return
 	;keyWait,v,T0.3
 	keyWait,Control,T0.5
     if !errorLevel
@@ -301,6 +389,7 @@ uriEncode(str) {
     
 #IfWinNotActive ahk_class ConsoleWindowClass
 ~lButton up::
+    return
     winWait,A,,1
     text := getHighlightedText()
     if text = 
@@ -320,13 +409,10 @@ return
 
   
 paste_selection:
-    sendinput {lbutton}
-    sendAsClipboard(quickClipboard)
+ ;  sendinput {lbutton}
+ ;  sendAsClipboard(quickClipboard)
 return
-  
-^mbutton::
-    sendAsClipboard(quickClipboard)
-return
+
 
 
 
