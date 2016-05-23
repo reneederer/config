@@ -21,6 +21,7 @@ Plugin 'easymotion/vim-easymotion'
 Plugin 'kien/ctrlp.vim'
 Plugin 'bling/vim-airline'
 Plugin 'godlygeek/tabular'
+Plugin 'xuhdev/SingleCompile'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -151,10 +152,16 @@ let g:ctrlp_mruf_max = 25
 let mapleader=","
 map <leader>= :Tabularize /=<enter>
 map <leader>: :Tabularize /:<enter>
-map <leader>w <esc>:w<enter>
-imap <leader>w <esc>:w<enter>
-vmap <leader>w <esc>:w<enter>
-map <leader>v <esc>:w<enter>:so $MYVIMRC<enter>
+map <leader>w <esc>:wa<enter>:w<enter>
+imap <leader>w <esc>:wa<enter>:w<enter>
+vmap <leader>w <esc>:wa<enter>:w<enter>
+map <leader>v <esc>:wa<enter>:so $MYVIMRC<enter>
+map gr "_dawPa<space><esc>
+set noswapfile
+set nobackup
+
+
+
 if has('gui_running')
   set guifont=Liberation\ Mono:h14
 endif
@@ -166,6 +173,25 @@ let g:ctrlp_prompt_mappings = {
     \ }
 
 map gw <c-w><c-w>
+set cmdheight=2
+map <leader>r <esc>:wa<cr>:! ghc Main.hs && ghc Tests.hs -e Tests.main && cls && Main.exe<cr>
+imap <leader>r <esc>:wa<cr>:! ghc Main.hs && ghc Tests.hs -e Tests.main && cls && Main.exe<cr>
+vmap <leader>r <esc>:wa<cr>:! ghc Main.hs && ghc Tests.hs -e Tests.main && cls && Main.exe<cr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
