@@ -2,8 +2,14 @@ set nocompatible              " be iMproved, required
 filetype off                  " required
 
 " set the runtime path to include Vundle and initialize
+
+let win_shell = (has('win32') || has('win64')) && &shellcmdflag =~ '/'
+let vimDir = win_shell ? '$HOME/vimfiles' : '$HOME/.vim'
+let &runtimepath .= ',' . expand(vimDir . '/bundle/Vundle.vim')
+
+call vundle#rc(expand(vimDir . '/bundle'))
 set rtp+=$HOME/vimfiles/bundle/Vundle.vim
-call vundle#begin('$HOME/vimfiles/bundle')
+call vundle#begin()
 " alternatively, pass a path where Vundle should install plugins
 "call vundle#begin('~/some/path/here')
 
@@ -44,7 +50,6 @@ set background=light
 set nocindent
 set noautoindent
 set smartindent
-colorscheme solarized
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
@@ -97,7 +102,7 @@ Plugin 'VundleVim/Vundle.vim'
 
 Plugin 'scrooloose/syntastic'
 Plugin 'scrooloose/nerdcommenter'
-Plugin 'altercation/vim-colors-solarized'
+Plugin 'flazz/vim-colorschemes'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-surround'
 Plugin 'gavocanov/vim-js-indent'
@@ -127,7 +132,7 @@ set background=light
 set nocindent
 set noautoindent
 set smartindent
-colorscheme solarized
+colorscheme buttercream
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
