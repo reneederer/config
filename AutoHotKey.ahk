@@ -16,6 +16,22 @@ sendMode Input
 :*:sgf::Sehr geehrte Frau{space}
 :*:sgh::Sehr geehrter Herr{space}
 
+!n::
+    sendInput,^s
+    sleep,1000
+    sendInput,c:\UniServerZ\www\site.html
+    sleep,1000
+    sendInput,{enter}
+    sleep,1000
+    sendInput,{left}
+    sleep,1000
+    sendInput,{enter}
+    sleep,1000
+    runWait,c:\users\Rene\dev\haskell\lazyapplicant\main.exe
+    sleep,1000
+    run,c:\users\Rene\dev\latex\application\main.pdf
+    return
+
 !r::
     inputbox,command
     runCommand(command)
