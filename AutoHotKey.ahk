@@ -12,7 +12,6 @@ sendMode Input
 ; global storedClipboards := Object()
 ; global quickClipboard = 
 
-:*:rasdial b::rasdial Breitbandverbindung ar2522738930 21304279
 :*:sgf::Sehr geehrte Frau{space}
 :*:sgh::Sehr geehrter Herr{space}
 
@@ -30,6 +29,10 @@ sendMode Input
     runWait,c:\users\Rene\dev\haskell\lazyapplicant\main.exe
     sleep,1000
     run,c:\users\Rene\dev\latex\application\main.pdf
+    return
+
+!t::
+    run,C:\Users\rene\.babun\cygwin\bin\mintty.exe
     return
 
 !r::
@@ -90,12 +93,8 @@ SC056 & u::sendInput,7
 SC056 & i::sendInput,8
 SC056 & o::sendInput,9
 SC056 & space::sendInput,0
-capslock & pause::setCapsLockState,off
 
-F9::
-    sendInput,#r
-    sleep,50
-    sendInput,rasdial Breitbandverbindung ar2522738930 21304279{enter}
+
 capslock & j::
     if getKeyState("shift", "p")
     {
@@ -154,13 +153,13 @@ capslock up::
     }
     else
     {
-        sendInput,!{tab}
+        sendInput,{escape}
         return
     }
 
 
 #space::toggleCurrentWindowOnTop()
-#g:: searchGoogle() ; TODO opens some other game window by default
+#o::searchGoogle() ; TODO opens some other game window by default
 
 ^l::reloadScript()
 
