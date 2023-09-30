@@ -1,5 +1,6 @@
 #SingleInstance force
 ; #NoEnv
+:*:ytdlp::python -m yt_dlp --extract-audio --audio-format mp3{space}
 SetTitleMatchMode 2
 setCapsLockState("AlwaysOff")
 capslock & -::é
