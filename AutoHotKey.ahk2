@@ -1,9 +1,12 @@
 #SingleInstance force
+
 ; #NoEnv
 :*:ytdlp::python -m yt_dlp --extract-audio --audio-format mp3{space}
 SetTitleMatchMode 2
+;SetKeyDelay(200)
 setCapsLockState("AlwaysOff")
-capslock & -::é
+capslock & -::ß
+capslock & =::é
 SC056 & m::sendInput("1")
 SC056 & ,::sendInput("2")
 SC056 & .::sendInput("3")
@@ -14,6 +17,85 @@ SC056 & u::sendInput("7")
 SC056 & i::sendInput("8")
 SC056 & o::sendInput("9")
 SC056 & space::sendInput("0")
+
+blocked := 0
+
+f1::
+{
+    global blocked
+    if(blocked)
+    {
+        r := msgBox("Unblock?", , 1)
+        if(r == "OK"){
+            blocked := 0
+            sendInput("{lwin up}{tab up}{alt up}")
+        }
+    }
+    else
+    {
+        blocked := 1
+    }
+    return
+}
+
+!tab::
+{
+    global blocked
+    if(blocked){
+        return
+    }
+    else
+    {
+        sendInput("{alt down}{tab down}")
+    }
+    return
+}
+
+lwin::
+{
+    global blocked
+    if(blocked){
+        return
+    }
+    else
+    {
+        sendInput("{lwin}")
+    }
+    return
+}
+
+
+    
+capslock & n::
+{
+    sendInput("{escape}{escape}")
+    sleep(50)
+    sendInput("{escape}{enter}")
+    sendInput("Idisplay(")
+    sleep(50)
+    sendInput("{escape}A)")
+    sleep(250)
+    sendInput("^{enter}{enter}")
+    return
+}
+
+^enter::
+{
+    sendInput("^{enter}{sleep 40}{enter}")
+    return
+}
+capslock & .::
+{
+    if winActive("Visual Studio Code") && winActive(".ipynb"){
+        sendInput("^{enter}{enter}")
+    }
+    else
+    {
+        sendInput("{enter}")
+    }
+    return
+}
+
 capslock & j::
 {
     if(getKeyState("shift", "p"))
@@ -63,8 +145,37 @@ capslock & m::sendInput("{enter}")
 capslock & o::sendInput("{end}{enter}")
 capslock & p::sendInput("{backspace}")
 capslock & i::sendInput("{end}")
-capslock & `;::sendInput("{home}")
-capslock & '::sendInput("{home}{shift down}{end}{shift up}^x{backspace}")
+capslock & a::sendInput("{home}")
+capslock & '::
+{
+    if getKeyState("shift", "p") {
+        sendInput("Ä")
+    }
+    else
+    {
+        sendInput("ä")
+    }
+}
+capslock & `;::
+{
+    if getKeyState("shift", "p") {
+        sendInput("Ö")
+    }
+    else
+    {
+        sendInput("ö")
+    }
+}
+capslock & [::
+{
+    if getKeyState("shift", "p") {
+        sendInput("Ü")
+    }
+    else
+    {
+        sendInput("ü")
+    }
+}
 :*:cw::{control down}{shift down}{right}{shift up}{control up}^x
 
 capslock up::
@@ -90,8 +201,7 @@ toggleCurrentWindowOnTop()
 
 reloadScript()
 {
-    setTitleMatchMode(2)
-    if winActive("AutoHotKey.ahk2")
+    ;if winActive("AutoHotKey.ahk2")
     {
         sendInput("^s")
         sleep(20)
@@ -100,3 +210,56 @@ reloadScript()
     }
     return
 }
+
+
+
+
+getSelectedText()
+{
+    
+}
+
+
+
+
+;:c*:\alpha::α
+;:c*:\beta::β
+;:c*:\Gamma::Γ
+;:c*:\gamma::γ
+;:c*:\Delta::Δ
+;:c*:\delta::δ
+;:c*:\in::ϵ
+;:c*:\epsilon::ε
+;:c*:\zeta::ζ
+;:c*:\eta::η
+;:c*:\iota::ι
+;:c*:\kappa::κ
+;:c*:\varkappa::ϰ
+;:c*:\Lambda::Λ
+;:c*:\lambda::λ
+;:c*:\mu::μ
+;:c*:\nu::ν
+;:c*:\Xi::Ξ
+;:c*:\xi::ξ
+;:c*:\Pi::Π
+;:c*:\pi::π
+;:c*:\varpi::ϖ
+;:c*:\rho::ρ
+;:c*:\varrho::ϱ
+;:c*:\Sigma::Σ
+;:c*:\sigma::σ
+;:c*:\varsigma::ς
+;:c*:\tau::τ
+;:c*:\Theta::Θ
+;:c*:\theta::θ
+;:c*:\vartheta::ϑ
+;:c*:\Upsilon::Υ
+;:c*:\upsilon::υ
+;:c*:\Phi::Φ
+;:c*:\phi::ϕ
+;:c*:\varphi::φ
+;:c*:\chi::χ
+;:c*:\Psi::Ψ
+;:c*:\psi::ψ
+;:c*:\Omega::Ω
+;:c*:\omega::ω
