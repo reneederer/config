@@ -25,8 +25,8 @@ f1::
     global blocked
     if(blocked)
     {
-        r := msgBox("Unblock?", , 1)
-        if(r == "OK"){
+        r := msgBox("Keep blocked?", , 1)
+        if(r == "Cancel"){
             blocked := 0
             sendInput("{lwin up}{tab up}{alt up}")
         }
@@ -38,34 +38,23 @@ f1::
     return
 }
 
+#HotIf (blocked == 1)
 !tab::
 {
-    global blocked
-    if(blocked){
-        return
-    }
-    else
-    {
-        sendInput("{alt down}{tab down}")
-    }
     return
 }
+#HotIf
 
-lwin::
+
+#HotIf (blocked == 1)
+~LWin::
 {
-    global blocked
-    if(blocked){
-        return
-    }
-    else
-    {
-        sendInput("{lwin}")
-    }
-    return
+    sendInput("{vkE8}")
+return
 }
+#HotIf
 
 
-    
 capslock & n::
 {
     sendInput("{escape}{escape}")
